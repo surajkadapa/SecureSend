@@ -5,6 +5,7 @@ from PIL import Image, ImageDraw
 import random
 import string
 import pyminizip
+import socket
 
 def random_str(n):
     res = ''.join(random.choices(string.ascii_uppercase + string.digits, k=n))
@@ -63,8 +64,6 @@ def createImg():
     image.save(res+".png")
     return (res+".png")
 
-
-
 def encImg():
     img_name = createImg()
     img = lsb.hide(img_name, msg, generators.eratosthenes())
@@ -76,6 +75,25 @@ def encZip(img_name):
     rand_name = random_str(8)+".zip"
     pyminizip.compress(img_name,None,rand_name,passw,1)
     print(rand_name)
+    sendFile(rand_name)
+
+def sendFile(file_name):
+    s = socket.socket()
+    print("socket created successfully")
+    port = 8800
+    host = '192.168.122.76'
+    s.connect((host, port))
+    f = open(file_name,'rb')
+    l = f.read(1024)
+    while(l):
+        s.send(l)
+        print("sending...")
+        l = f.read(1024)
+    print("done")
+    f.close()
+    s.close()
+
+
 
 
 if __name__ == '__main__':
