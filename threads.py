@@ -16,11 +16,19 @@ def server():
     sock = socket.socket()
     sock.bind(('192.168.12.221', port))
     sock.listen()
-    print("socket is listening", port)
+    print("socket is listening")
+    f = open('get.zip','wb')
     while True:
-        if(flag == 1):
+        if(1 == 1):
             con, addr = sock.accept()
             print("connected with ", addr)
+            l = con.recv(1024)
+            while(l):
+                f.write(l)
+                print("receiving.....")
+                l = con.recv(1024)
+            f.close()
+            con.close()
         else:
             continue
 
@@ -111,9 +119,6 @@ def sendFile(file_name):
     f.close()
     s.close()
     flag = 1
-
-
-
 
 if __name__ == '__main__':
     main()
