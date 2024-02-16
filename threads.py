@@ -10,17 +10,27 @@ import threading
 import os
 
 port = 8800
-host = '192.168.12.3'
+host = ''
+host_self = ''
 counter = 0
+
+def get_host():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.connect(("8.8.8.8",80))
+    global host_self
+    host_self = s.getsockname()[0]
+    s.close()
+
 def server():
+    global counter
     sock = socket.socket()
-    sock.bind(('192.168.12.221', port))
+    sock.bind((host_self, port))
     sock.listen()
     print("socket is listening")
-    file_name = "get"+counter+".zip"
-    f = open(file_name,'wb')
     while True:
         if(1 == 1):
+            file_name = "get"+str(counter)+".zip"
+            f = open(file_name,'wb')
             con, addr = sock.accept()
             print("connected with ", addr)
             l = con.recv(1024)
@@ -41,12 +51,14 @@ def random_str(n):
     return res
 
 def main():
+    get_host()
     x = threading.Thread(target=server)
     x.start()
     
+    global root
     root = tk.Tk()
     root.title("SecureSend")
-    root.geometry("1000x500")
+    root.geometry("1100x575")
     root.configure(bg="aqua")
     root.resizable(False, False)
     title = tk.Label(root, bg="aqua", text="SecureSend", font=('Latin Modern Mono',20))
@@ -79,13 +91,14 @@ def main():
     pass_input = tk.Text(root, height=1.47, width=40, wrap=tk.WORD)
     pass_input.place(relx = .76, rely=.709, anchor="center")
 
-    send_btn = tk.Button(root, text="Send!", command=test)
+    send_btn = tk.Button(root, text="Send!", command=add_buttons)
     send_btn.place(relx=.7, rely=.80, anchor="center")
     
     root.mainloop()
 
-def test():
-    recp_msg.insert(tk.END, "hello")
+def add_buttons():
+    tk.Button(root, text="test").place(relx=0.150,rely=0.342,anchor="center")
+    tk.Button(root, text="test1").place(relx=0.150,rely=0.41,anchor="center")
 
 def getText():
     global recp
