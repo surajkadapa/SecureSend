@@ -43,6 +43,7 @@ def random_str(n):
 def main():
     x = threading.Thread(target=server)
     x.start()
+    
     root = tk.Tk()
     root.title("SecureSend")
     root.geometry("1000x500")
