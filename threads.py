@@ -7,17 +7,18 @@ import string
 import pyminizip
 import socket
 import threading
+import os
 
 port = 8800
 host = '192.168.12.3'
-flag = 1
-
+counter = 0
 def server():
     sock = socket.socket()
     sock.bind(('192.168.12.221', port))
     sock.listen()
     print("socket is listening")
-    f = open('get.zip','wb')
+    file_name = "get"+counter+".zip"
+    f = open(file_name,'wb')
     while True:
         if(1 == 1):
             con, addr = sock.accept()
@@ -27,8 +28,11 @@ def server():
                 f.write(l)
                 print("receiving.....")
                 l = con.recv(1024)
+            print("done")
             f.close()
             con.close()
+            #decrypt(file_name)
+            counter +=1 
         else:
             continue
 
@@ -46,25 +50,41 @@ def main():
     root.resizable(False, False)
     title = tk.Label(root, bg="aqua", text="SecureSend", font=('Latin Modern Mono',20))
     title.place(relx=.5,rely=.05,anchor='center')
+
+    msg_rec = tk.Label(root, bg="aqua", text="Messages recieved", font=('Latin Modern Mono',20))
+    msg_rec.place(relx=0.15, rely=0.2, anchor="center")
+    global recp_msg
+    recp_msg = tk.Text(root, height=20, width=20, wrap=tk.WORD)
+    recp_msg.place(relx=0.150, rely=0.600, anchor="center")
+
     recepient = tk.Label(root, bg="aqua", text="Recepient IP", font=('Latin Modern Mono',20))
-    recepient.place(relx=.157, rely=.157, anchor="center")
+    recepient.place(relx=.40, rely=.2, anchor="center")
+
     global recp_input
     recp_input = tk.Text(root, height=1.45, width=40, wrap=tk.WORD)
-    recp_input.place(relx = .46, rely=.157, anchor="center")
+    recp_input.place(relx = 0.71, rely=.2, anchor="center")
+
     msg = tk.Label(root, bg="aqua", text="Message", font=('Latin Modern Mono',20))
-    msg.place(relx=.157, rely=.297, anchor="center")
+    msg.place(relx=.40, rely=.297, anchor="center")
+
     global msg_input
     msg_input = tk.Text(root, height=11, width=65, wrap=tk.WORD)
-    msg_input.place(relx = .547, rely=.44, anchor="center")
+    msg_input.place(relx = .747, rely=.44, anchor="center")
+    
     passw = tk.Label(root, bg="aqua", text="Password", font=('Latin Modern Mono',20))
-    passw.place(relx=.157, rely=.709, anchor="center")
+    passw.place(relx=.4, rely=.709, anchor="center")
+
     global pass_input
     pass_input = tk.Text(root, height=1.47, width=40, wrap=tk.WORD)
-    pass_input.place(relx = .46, rely=.709, anchor="center")
-    send_btn = tk.Button(root, text="Send!", command=getText)
+    pass_input.place(relx = .76, rely=.709, anchor="center")
+
+    send_btn = tk.Button(root, text="Send!", command=test)
     send_btn.place(relx=.7, rely=.80, anchor="center")
+    
     root.mainloop()
 
+def test():
+    recp_msg.insert(tk.END, "hello")
 
 def getText():
     global recp
@@ -102,7 +122,6 @@ def encZip(img_name):
     rand_name = random_str(8)+".zip"
     pyminizip.compress(img_name,None,rand_name,passw,1)
     print(rand_name)
-    flag = 0
     sendFile(rand_name)
 
 def sendFile(file_name):
@@ -118,7 +137,15 @@ def sendFile(file_name):
     print("done")
     f.close()
     s.close()
-    flag = 1
+
+# def decrypt(file_name):
+#     pass = decPass(file_name) #need to implement
+#     pyminizip.uncompress(file_name,pass,None,0)
+#     file_name = file_name.removesuffix('.zip')
+#     l = os.listdir(file_name)
+#     fin_file = l[0]
+#     msg = lsb.reveal(os.getcwd()+"/"+file_name+"/"+fin_file, generators.eratosthenes())
+#     return msg
 
 if __name__ == '__main__':
     main()
