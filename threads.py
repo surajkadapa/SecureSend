@@ -1,18 +1,23 @@
 import tkinter as tk
+from tkinter import simpledialog
 from stegano import lsb
 from stegano.lsb import generators
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageTk
 import random
 import string
 import pyminizip
 import socket
 import threading
 import os
+import zipfile
+from test import Tooltip
+from tkinter import PhotoImage
 
 port = 8800
-host = ''
+host = '192.168.122.106'
 host_self = ''
 counter = 0
+pass1 = ''
 
 def get_host():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -41,7 +46,7 @@ def server():
             print("done")
             f.close()
             con.close()
-            #decrypt(file_name)
+            decrypt(file_name)
             counter +=1 
         else:
             continue
@@ -49,7 +54,9 @@ def server():
 def random_str(n):
     res = ''.join(random.choices(string.ascii_uppercase + string.digits, k=n))
     return res
-
+bg_main = "#1e1f2b"
+bg_text = "#9a9aac"
+color_text = "#b1b8bc"
 def main():
     get_host()
     x = threading.Thread(target=server)
@@ -59,46 +66,54 @@ def main():
     root = tk.Tk()
     root.title("SecureSend")
     root.geometry("1100x575")
-    root.configure(bg="aqua")
+    root.configure(bg=bg_main)
     root.resizable(False, False)
-    title = tk.Label(root, bg="aqua", text="SecureSend", font=('Latin Modern Mono',20))
+    title = tk.Label(root, bg=bg_main, text="SecureSend", font=('Latin Modern Mono',20), fg=color_text)
     title.place(relx=.5,rely=.05,anchor='center')
 
-    msg_rec = tk.Label(root, bg="aqua", text="Messages recieved", font=('Latin Modern Mono',20))
+    width = 30
+    height = 30
+    img = Image.open("user.png")
+    img = img.resize((width, height), Image.Resampling.LANCZOS)
+    image = ImageTk.PhotoImage(img)
+    ip_addr = tk.Button(root, text="Ip address", image=image)
+    ip_addr.place(relx=0.05, rely=0.03, anchor="center")
+    Tooltip(ip_addr, text=host_self, wraplength=100)
+
+    msg_rec = tk.Label(root, bg=bg_main, text="Recieved", font=('Latin Modern Mono',20), fg=color_text)
     msg_rec.place(relx=0.15, rely=0.2, anchor="center")
     global recp_msg
-    recp_msg = tk.Text(root, height=20, width=20, wrap=tk.WORD)
+    recp_msg = tk.Text(root, height=20, width=20, wrap=tk.WORD, bg=bg_text, highlightbackground=bg_text, highlightthickness=0)
     recp_msg.place(relx=0.150, rely=0.600, anchor="center")
 
-    recepient = tk.Label(root, bg="aqua", text="Recepient IP", font=('Latin Modern Mono',20))
+    recepient = tk.Label(root, bg=bg_main, text="Host", font=('Latin Modern Mono',20), fg=color_text)
     recepient.place(relx=.40, rely=.2, anchor="center")
 
     global recp_input
-    recp_input = tk.Text(root, height=1.45, width=40, wrap=tk.WORD)
-    recp_input.place(relx = 0.71, rely=.2, anchor="center")
+    recp_input = tk.Text(root, height=1.45, width=40, wrap=tk.WORD, bg=bg_text, highlightbackground=bg_text, highlightthickness=0)
+    recp_input.place(relx = 0.656, rely=.2, anchor="center")
 
-    msg = tk.Label(root, bg="aqua", text="Message", font=('Latin Modern Mono',20))
+    msg = tk.Label(root, bg=bg_main, text="Message", font=('Latin Modern Mono',20), fg=color_text)
     msg.place(relx=.40, rely=.297, anchor="center")
 
     global msg_input
-    msg_input = tk.Text(root, height=11, width=65, wrap=tk.WORD)
+    msg_input = tk.Text(root, height=11, width=65, wrap=tk.WORD, bg=bg_text, highlightbackground=bg_text, highlightthickness=0)
     msg_input.place(relx = .747, rely=.44, anchor="center")
     
-    passw = tk.Label(root, bg="aqua", text="Password", font=('Latin Modern Mono',20))
+    passw = tk.Label(root, bg=bg_main, text="Password", font=('Latin Modern Mono',20), fg=color_text)
     passw.place(relx=.4, rely=.709, anchor="center")
 
     global pass_input
-    pass_input = tk.Text(root, height=1.47, width=40, wrap=tk.WORD)
-    pass_input.place(relx = .76, rely=.709, anchor="center")
+    pass_input = tk.Text(root, height=1.47, width=40, wrap=tk.WORD, bg=bg_text, highlightbackground=bg_text, highlightthickness=0)
+    pass_input.place(relx = .655, rely=.709, anchor="center")
 
-    send_btn = tk.Button(root, text="Send!", command=add_buttons)
+    send_btn = tk.Button(root, text="Send!", command=getText)
     send_btn.place(relx=.7, rely=.80, anchor="center")
     
     root.mainloop()
 
-def add_buttons():
+def add_buttons(file_name):
     tk.Button(root, text="test").place(relx=0.150,rely=0.342,anchor="center")
-    tk.Button(root, text="test1").place(relx=0.150,rely=0.41,anchor="center")
 
 def getText():
     global recp
@@ -152,14 +167,36 @@ def sendFile(file_name):
     f.close()
     s.close()
 
-# def decrypt(file_name):
-#     pass = decPass(file_name) #need to implement
-#     pyminizip.uncompress(file_name,pass,None,0)
-#     file_name = file_name.removesuffix('.zip')
-#     l = os.listdir(file_name)
-#     fin_file = l[0]
-#     msg = lsb.reveal(os.getcwd()+"/"+file_name+"/"+fin_file, generators.eratosthenes())
-#     return msg
+filenameinternal = ''
+
+def getPass():
+    global pass1
+    global filenameinternal
+    file_name = filenameinternal
+    userinp = simpledialog.askstring(title="test",prompt="password")
+    pass1 = userinp
+    os.mkdir("get0")
+    print(os.getcwd())
+    with zipfile.ZipFile(file_name) as zf:
+        zf.extractall("get0/",pwd=bytes(pass1,'utf-8'))
+    file_name = file_name.removesuffix('.zip')
+    print(os.getcwd()+"/get0")
+    l = os.listdir(os.getcwd()+"/get0")
+    fin_file = l[0]
+    msg = lsb.reveal(os.getcwd()+"/"+file_name+"/"+fin_file, generators.eratosthenes())
+    print(msg)
+
+def decPass(file_name):
+    global counter
+    global filenameinternal
+    filenameinternal = file_name
+    x = (.072*(counter+1))
+    tk.Button(root, text=file_name, command=getPass).place(relx=0.150,rely=(0.322+x),anchor="center")
+
+def decrypt(file_name):
+    global pass1
+    decPass(file_name) 
+    
 
 if __name__ == '__main__':
     main()
