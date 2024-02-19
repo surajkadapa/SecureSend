@@ -88,7 +88,7 @@ def main():
     msg_rec = tk.Label(root, bg=bg_main, text="Recieved", font=('Latin Modern Mono',20), fg=color_text)
     msg_rec.place(relx=0.15, rely=0.2, anchor="center")
     global recp_msg
-    recp_msg = tk.Text(root, height=20, width=20, wrap=tk.WORD, bg=bg_text, highlightbackground=bg_text, highlightthickness=0)
+    recp_msg = tk.Text(root, height=20, width=23, wrap=tk.WORD, bg=bg_text, highlightbackground=bg_text, highlightthickness=0)
     recp_msg.place(relx=0.150, rely=0.600, anchor="center")
 
     recepient = tk.Label(root, bg=bg_main, text="Host", font=('Latin Modern Mono',20), fg=color_text)
