@@ -12,12 +12,15 @@ import os
 import zipfile
 from tooltip import Tooltip
 from tkinter import PhotoImage
+import shutil
+import time
 
 port = 8800
 host = ''
 host_self = ''
 counter = 0
 pass1 = ''
+curr_counter = 0
 
 def get_host():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -27,6 +30,7 @@ def get_host():
     s.close()
 
 def server():
+    global recp_addr
     global counter
     sock = socket.socket()
     sock.bind((host_self, port))
@@ -37,6 +41,7 @@ def server():
             file_name = "get"+str(counter)+".zip"
             f = open(file_name,'wb')
             con, addr = sock.accept()
+            recp_addr = addr
             print("connected with ", addr)
             l = con.recv(1024)
             while(l):
@@ -46,7 +51,7 @@ def server():
             print("done")
             f.close()
             con.close()
-            decrypt(file_name)
+            decrypt(file_name, counter)
             counter +=1 
         else:
             continue
@@ -174,29 +179,38 @@ filenameinternal = ''
 def getPass():
     global pass1
     global filenameinternal
+    global curr_counter
+    counter = curr_counter
     file_name = filenameinternal
     userinp = simpledialog.askstring(title="Password",prompt="password")
     pass1 = userinp
-    os.mkdir("get0")
+    os.mkdir("get"+str(counter))
     print(os.getcwd())
     with zipfile.ZipFile(file_name) as zf:
-        zf.extractall("get0/",pwd=bytes(pass1,'utf-8'))
+        zf.extractall("get"+str(counter)+"/",pwd=bytes(pass1,'utf-8'))
     file_name = file_name.removesuffix('.zip')
-    print(os.getcwd()+"/get0")
-    l = os.listdir(os.getcwd()+"/get0")
+    print(os.getcwd()+"/get"+str(counter))
+    l = os.listdir(os.getcwd()+"/get"+str(counter))
     fin_file = l[0]
     msg = lsb.reveal(os.getcwd()+"/"+file_name+"/"+fin_file, generators.eratosthenes())
     os.system("python3 show_msg.py \""+msg+"\"")
+    shutil.rmtree("get"+str(counter), ignore_errors=True)
     print(msg)
 
 def decPass(file_name):
     global counter
     global filenameinternal
+    global recp_addr
+    addr = recp_addr
     filenameinternal = file_name
     x = (.072*(counter+1))
-    tk.Button(root, text=file_name, command=getPass).place(relx=0.150,rely=(0.322+x),anchor="center")
+    t = time.localtime()
+    current_time = time.strftime("%H:%M", t)
+    tk.Button(root, text=str(addr[0])+"|"+str(current_time), command=getPass).place(relx=0.150,rely=(0.27+x),anchor="center")
 
-def decrypt(file_name):
+def decrypt(file_name, curr_counter1):
+    global curr_counter
+    curr_counter = curr_counter1
     global pass1
     decPass(file_name) 
     
