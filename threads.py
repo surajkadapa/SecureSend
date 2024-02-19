@@ -14,7 +14,7 @@ from test import Tooltip
 from tkinter import PhotoImage
 
 port = 8800
-host = '192.168.122.106'
+host = ''
 host_self = ''
 counter = 0
 pass1 = ''
@@ -118,6 +118,8 @@ def add_buttons(file_name):
 def getText():
     global recp
     recp = recp_input.get(1.0,"end-1c")
+    global host
+    host = recp
     global msg 
     msg = msg_input.get(1.0,"end-1c")
     global passw
