@@ -83,7 +83,7 @@ def main():
     image = ImageTk.PhotoImage(img)
     ip_addr = tk.Button(root, text="Ip address", image=image)
     ip_addr.place(relx=0.05, rely=0.03, anchor="center")
-    Tooltip(ip_addr, text=host_self, wraplength=100)
+    Tooltip(ip_addr, text=host_self, wraplength=150)
 
     msg_rec = tk.Label(root, bg=bg_main, text="Recieved", font=('Latin Modern Mono',20), fg=color_text)
     msg_rec.place(relx=0.15, rely=0.2, anchor="center")
