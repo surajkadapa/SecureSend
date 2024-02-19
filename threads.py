@@ -10,7 +10,7 @@ import socket
 import threading
 import os
 import zipfile
-from test import Tooltip
+from tooltip import Tooltip
 from tkinter import PhotoImage
 
 port = 8800
@@ -175,7 +175,7 @@ def getPass():
     global pass1
     global filenameinternal
     file_name = filenameinternal
-    userinp = simpledialog.askstring(title="test",prompt="password")
+    userinp = simpledialog.askstring(title="Password",prompt="password")
     pass1 = userinp
     os.mkdir("get0")
     print(os.getcwd())
@@ -186,6 +186,7 @@ def getPass():
     l = os.listdir(os.getcwd()+"/get0")
     fin_file = l[0]
     msg = lsb.reveal(os.getcwd()+"/"+file_name+"/"+fin_file, generators.eratosthenes())
+    os.system("python3 show_msg.py \""+msg+"\"")
     print(msg)
 
 def decPass(file_name):
